@@ -38,6 +38,7 @@ export const flightValidator = async (req, res, next) => {
         const sqlAirplaneQuery = "select * from airplane where id = ?"
         const [airplane] = await con.execute(sqlAirplaneQuery, [req.body.airplane_id])
 
+
         if (!airplane[0]) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 success: false,

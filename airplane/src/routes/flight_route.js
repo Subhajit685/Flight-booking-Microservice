@@ -3,6 +3,7 @@ import { crateFlight, deleteFlight, filerFlight, getAllFlight, getFlightById } f
 import { flightValidator } from "../middlewares/flight_middleware.js"
 const router = express.Router()
 
+
 router.post("/", flightValidator, crateFlight)
 
 router.get("/", getAllFlight)

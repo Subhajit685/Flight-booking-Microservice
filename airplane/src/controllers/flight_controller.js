@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import con from "../config/DB_connection.js";
 
+
 export const crateFlight = async (req, res) => {
   const sqlAirplaneQuery = "select * from airplane where id = ?";
   const [airplane] = await con.execute(sqlAirplaneQuery, [
@@ -55,7 +56,7 @@ export const getAllFlight = async (req, res) => {
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "All flights",
-      data: { flights },
+      data: { flights }
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

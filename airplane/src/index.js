@@ -40,7 +40,7 @@ const deleteFlight = async() => {
 }
   
 cron.schedule("* * * * *", deleteFlight)
-// cron.schedule("* * * * *", addflightPErDay)
+// cron.schedule("41 18 * * *", addflightPErDay)
 
 
 app.use("/api/airplane", airplaneRoute)

@@ -56,6 +56,7 @@ export const getAllFlight = async (req, res) => {
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "All flights",
+      length : flights.length,
       data: { flights }
     });
   } catch (error) {

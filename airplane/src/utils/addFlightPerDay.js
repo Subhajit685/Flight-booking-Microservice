@@ -7,23 +7,12 @@ const airplaneSet = async(id) =>{
     return airplane[0].capacity
 }
 
-// try {
-//     arr.map(async(item)=>{
-//         let seat = await airplaneSet(Number(item[1]))
-//         [item[0],[seat])
-//     })
-
-//     console.log("end")
-// } catch (error) {
-//     console.log(error)
-// }
 
 export const addflightPErDay = async() => {
     // let today = new Date().toISOString().slice(0, 10)
     let today = new Date();
-    today.setDate(today.getDate() + 3);
+    today.setDate(today.getDate() + 2);
     today = today.toISOString().slice(0, 10);
-    console.log("hi")
 
     const arr = [[`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('UK5180', 12, 13, '${today} 06:39:00', '${today} 08:20:00', 7650, 'C2', 80, ?);`, "80"],
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('G89799', 13, 12, '${today} 06:15:00', '${today} 09:44:00', 5432, 'B2', 81, ?);`, "81"],
@@ -4375,4 +4364,13 @@ export const addflightPErDay = async() => {
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('G87213', 41, 40, '${today} 15:54:00', '${today} 18:33:00', 7721, 'D1', 43, ?);`, "43"],
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('G86119', 40, 41, '${today} 18:58:00', '${today} 22:09:00', 10304, 'A2', 66, ?);`, "66"],
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('6E3479', 41, 40, '${today} 18:50:00', '${today} 20:02:00', 13563, 'D2', 52, ?);`, "52"]]
+
+    try {
+        arr.map(async(item)=>{
+            const seat = await airplaneSet(Number(item[1]))
+            await con.execute(item[0], [seat])
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }

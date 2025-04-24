@@ -11,7 +11,7 @@ const airplaneSet = async(id) =>{
 export const addflightPErDay = async() => {
     // let today = new Date().toISOString().slice(0, 10)
     let today = new Date();
-    today.setDate(today.getDate() + 2);
+    today.setDate(today.getDate() + 1);
     today = today.toISOString().slice(0, 10);
 
     const arr = [[`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('UK5180', 12, 13, '${today} 06:39:00', '${today} 08:20:00', 7650, 'C2', 80, ?);`, "80"],

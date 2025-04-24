@@ -1,0 +1,89 @@
+version: '3'
+
+services:
+
+  airplane:
+    build: 
+      dockerfile: Dockerfile
+      context: ./airplane
+    container_name: airplane
+    ports:
+      - "4001:4001"
+    restart: always
+    env_file:
+      - ./airplane/.env
+    depends_on:
+      - rabbtimq
+    
+  apigatewaya:
+    build: 
+      dockerfile: Dockerfile
+      context: ./apigatewaya
+    container_name: apigatewaya
+    ports:
+      - "4000:4000"
+    restart: always
+    env_file:
+      - ./apigatewaya/.env
+    depends_on:
+      - rabbtimq
+      - airplane
+      - booking
+      - notification
+      - user
+
+  booking:
+    build: 
+      dockerfile: Dockerfile
+      context: ./booking
+    container_name: booking
+    ports:
+      - "4002:4002"
+    restart: always
+    env_file:
+      - ./booking/.env
+    depends_on:
+      - rabbtimq
+
+  notification:
+    build: 
+      dockerfile: Dockerfile
+      context: ./notification
+    container_name: notification
+    ports:
+      - "4003:4003"
+    restart: always
+    env_file:
+      - ./notification/.env
+    depends_on:
+      - rabbtimq
+
+  user:
+    build: 
+      dockerfile: Dockerfile
+      context: ./user
+    container_name: user
+    ports:
+      - "4004:4004"
+    restart: always
+    env_file:
+      - ./user/.env
+    depends_on:
+      - rabbtimq
+
+  client:
+    build: 
+      dockerfile: Dockerfile
+      context: ./frontend
+    container_name: client
+    ports:
+      - "5173:5173"
+    restart: always
+    depends_on:
+      - apigatewaya
+
+  rabbtimq:
+    image: rabbitmq:4-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"

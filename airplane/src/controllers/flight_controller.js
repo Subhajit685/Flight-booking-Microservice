@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import con from "../config/DB_connection.js";
 
-
 export const crateFlight = async (req, res) => {
   const sqlAirplaneQuery = "select * from airplane where id = ?";
   const [airplane] = await con.execute(sqlAirplaneQuery, [
@@ -57,7 +56,7 @@ export const getAllFlight = async (req, res) => {
       success: true,
       message: "All flights",
       length: flights.length,
-      data: { flights }
+      data: { flights },
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -210,7 +209,7 @@ export const deleteFlight = async (req, res) => {
 };
 
 export const filerFlight = async (req, res) => {
-  console.log(req.query)
+  console.log(req.query);
   let sqlQuery = `SELECT 
   f.id AS flight_id,
     f.flight_name AS flight_name, f.available_seat, f.departure_time, f.arrival_time, f.price, f.boarding_gate,
@@ -226,8 +225,9 @@ export const filerFlight = async (req, res) => {
 
   // travel query
   if (req.query.travel) {
-    let newQuery = `departure_airport.code = '${req.query.travel.split("-")[0]
-      }' 
+    let newQuery = `departure_airport.code = '${
+      req.query.travel.split("-")[0]
+    }' 
                 AND arr_airport.code = '${req.query.travel.split("-")[1]}'`;
 
     sqlQuery = sqlQuery + " " + newQuery;
@@ -236,38 +236,40 @@ export const filerFlight = async (req, res) => {
   // candidate query
   if (req.query.candidate) {
     let check = sqlQuery.slice(sqlQuery.length - 6, sqlQuery.length);
-    const newQuery = `${check === " WHERE" ? "" : " AND"} f.available_seat >= ${req.query.candidate
-      }`;
+    const newQuery = `${check === " WHERE" ? "" : " AND"} f.available_seat >= ${
+      req.query.candidate
+    }`;
     sqlQuery += newQuery;
   }
 
   // price query
   if (req.query.price) {
     let check = sqlQuery.slice(sqlQuery.length - 6, sqlQuery.length);
-    const newQuery = `${check === " WHERE" ? "" : " AND"} f.price BETWEEN ${req.query.price.split("-")[0]
-      } AND ${req.query.price.split("-")[1]}`;
+    const newQuery = `${check === " WHERE" ? "" : " AND"} f.price BETWEEN ${
+      req.query.price.split("-")[0]
+    } AND ${req.query.price.split("-")[1]}`;
     sqlQuery += newQuery;
   }
 
   // date and time query
   if (req.query.date && req.query.time) {
     let check = sqlQuery.slice(sqlQuery.length - 6, sqlQuery.length);
-    console.log("hi", check)
-    const newQuery = `${check === " WHERE" ? "" : " AND"
-      } f.departure_time
-  BETWEEN STR_TO_DATE('${req.query.date} ${req.query.time.split("-")[0]
-      }', '%d-%m-%Y %H:%i:%s') 
-  AND STR_TO_DATE('${req.query.date} ${req.query.time.split("-")[1]
-      }', '%d-%m-%Y %H:%i:%s')`;
+    console.log("hi", check);
+    const newQuery = `${check === " WHERE" ? "" : " AND"} f.departure_time
+  BETWEEN STR_TO_DATE('${req.query.date} ${
+      req.query.time.split("-")[0]
+    }', '%d-%m-%Y %H:%i:%s') 
+  AND STR_TO_DATE('${req.query.date} ${
+      req.query.time.split("-")[1]
+    }', '%d-%m-%Y %H:%i:%s')`;
     sqlQuery += newQuery;
   }
 
   // date query
   if (req.query.date && !req.query.time) {
     let check = sqlQuery.slice(sqlQuery.length - 6, sqlQuery.length);
-    console.log("hi2", check)
-    const newQuery = `${check === " WHERE" ? "" : " AND"
-      } f.departure_time
+    console.log("hi2", check);
+    const newQuery = `${check === " WHERE" ? "" : " AND"} f.departure_time
     BETWEEN STR_TO_DATE('${req.query.date} 00:00:00', '%d-%m-%Y %H:%i:%s') 
     AND STR_TO_DATE('${req.query.date} 23:59:59', '%d-%m-%Y %H:%i:%s')`;
     sqlQuery += newQuery;
@@ -282,11 +284,32 @@ export const filerFlight = async (req, res) => {
   try {
     sqlQuery += ";";
     // console.log(sqlQuery)
+    let min = 0;
+    let max = 0;
     const [filter] = await con.execute(sqlQuery);
+    // console.log(filter)
+
+    if (filter.length > 0) {
+      filter.map((f) => {
+        if (min === 0 && max === 0) {
+          min = Number(f.price);
+          max = Number(f.price);
+        }
+        if (min > Number(f.price)) {
+          min = Number(f.price);
+        }
+        if (max < Number(f.price)) {
+          max = Number(f.price);
+        }
+      });
+    }
+
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Flight filter successfully",
       data: { filter },
+      max,
+      min,
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -298,11 +321,11 @@ export const filerFlight = async (req, res) => {
 };
 
 export const seatDic = async (req, res) => {
-  const { seat, flightID } = req.params
+  const { seat, flightID } = req.params;
 
   const sql = `update flight set available_seat = available_seat - ? where id = ?;`;
   try {
-    const [result] = await con.execute(sql, [seat, flightID])
+    const [result] = await con.execute(sql, [seat, flightID]);
     if (result.affectedRows > 0) {
       return res.status(StatusCodes.OK).json({
         success: true,
@@ -310,7 +333,7 @@ export const seatDic = async (req, res) => {
         data: {},
       });
     }
-    if(result.affectedRows === 0){
+    if (result.affectedRows === 0) {
       return res.status(StatusCodes.OK).json({
         success: true,
         message: "Flight not exites",
@@ -329,15 +352,15 @@ export const seatDic = async (req, res) => {
       data: {},
     });
   }
-}
+};
 
 export const seatInc = async (req, res) => {
-  const { seat, flightID } = req.params
+  const { seat, flightID } = req.params;
 
   const sql = `update flight set available_seat = available_seat + ? where id = ?;`;
   try {
-    const [result] = await con.execute(sql, [seat, flightID])
-    console.log(result)
+    const [result] = await con.execute(sql, [seat, flightID]);
+    console.log(result);
     if (result.affectedRows > 0) {
       return res.status(StatusCodes.OK).json({
         success: true,
@@ -345,7 +368,7 @@ export const seatInc = async (req, res) => {
         data: {},
       });
     }
-    if(result.affectedRows === 0){
+    if (result.affectedRows === 0) {
       return res.status(StatusCodes.OK).json({
         success: true,
         message: "Flight not exites",
@@ -364,4 +387,4 @@ export const seatInc = async (req, res) => {
       data: {},
     });
   }
-}
+};

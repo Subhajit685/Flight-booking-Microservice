@@ -2,12 +2,13 @@ import con from "../config/DB_connection.js"
 import { StatusCodes } from "http-status-codes"
 import axios from "axios"
 import dotenv from "dotenv"
+import { connectMq, DELconnectMq } from "../config/rabbit_mp.js"
 dotenv.config()
 
 export const flightBooking = async (req, res) =>{
-    const {flight_id, mobile, candidates, num_candidates, total_price} = req.body
+    const {flight_id, email, candidates, num_candidates, total_price} = req.body
 
-    if(!flight_id, !mobile, !candidates, !num_candidates, !total_price){
+    if(!flight_id, !email, !candidates, !num_candidates, !total_price){
         return res.status(StatusCodes.BAD_REQUEST).json({
             success: false,
             message: `All fileds requried.`,
@@ -15,7 +16,7 @@ export const flightBooking = async (req, res) =>{
         })
     }
 
-    const sqlQuery = "insert into flight_bookings (flight_id, mobile, candidates, num_candidates, totel_price, booked_at, payment_at) values (?, ?, ?, ?, ?, NOW(), null);"
+    const sqlQuery = "insert into flight_bookings (flight_id, email, candidates, num_candidates, totel_price, booked_at, payment_at) values (?, ?, ?, ?, ?, NOW(), null);"
     try {
         const responce = await axios.get(`${process.env.AIRPLANE_BASE_URL}/api/flight/by-id/${flight_id}`)
         const flight = await responce.data.data.flight
@@ -26,7 +27,7 @@ export const flightBooking = async (req, res) =>{
                 data: {}
             })
         }
-        const [booking] = await con.execute(sqlQuery, [flight_id, mobile, JSON.stringify(candidates), num_candidates, total_price])
+        const [booking] = await con.execute(sqlQuery, [flight_id, email, JSON.stringify(candidates), num_candidates, total_price])
         if(booking.affectedRows > 0){
 
             const responce = await axios.post(`${process.env.AIRPLANE_BASE_URL}/api/flight/dic/${num_candidates}/${flight_id}`)
@@ -63,6 +64,7 @@ export const cancelBooking = async(req, res) =>{
 
             const [result] = await con.execute(delsql, [bookingID])
             if(result.affectedRows > 0){
+                await DELconnectMq(booking[0])
                 return res.status(StatusCodes.OK).json({
                     success: true,
                     message: `Cancle successfully.`,
@@ -80,6 +82,36 @@ export const cancelBooking = async(req, res) =>{
             message: `Some problem occer. Please try again.`,
             data: {}
         })
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: `Internal server error`,
+            data: {error}
+        })
+    }
+}
+
+export const showBookOrder = async (req, res) => {
+    const {email} = req.params
+    try {
+
+        const sql = `select * from flight_bookings where email = ?;`;
+
+        const [result] = await con.execute(sql, [email])
+
+        if(result.length > 0){
+            return res.status(StatusCodes.OK).json({
+                success: true,
+                message: `All booking.`,
+                data: {data : result}
+            })
+        }
+        return res.status(StatusCodes.OK).json({
+            success: true,
+            message: `No order.`,
+            data: {data : []}
+        })
+        
     } catch (error) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             success: false,

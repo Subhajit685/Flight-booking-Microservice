@@ -7,13 +7,13 @@ const Flight = () => {
   const parems = useParams();
   const candidate = localStorage.getItem("candidate");
   const [flight, setflight] = useState({});
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [passengers, setPassengers] = useState(
     Array.from({ length: candidate }, () => ({ name: "", age: "" }))
   );
 
-  const [email, setemail] = useState("")
+  const [email, setemail] = useState("");
 
   const handleChange = (index, field, value) => {
     const updated = [...passengers];
@@ -22,53 +22,54 @@ const Flight = () => {
   };
 
   const handelpay = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const value = {
-      flight_id : parems.id, 
-      email : email, 
-      candidates : passengers, 
-      num_candidates : candidate, 
-      total_price : candidate * flight.price
-  }
+      flight_id: parems.id,
+      email: email,
+      candidates: passengers,
+      num_candidates: candidate,
+      total_price: candidate * flight.price,
+    };
     // console.log(JSON.stringify(value))
     try {
-      const res = await fetch(`http://localhost:4000/book/api/book/flight-booking`,{
-        method : "POST",
-        credentials : "include",
-        headers : {
-          "Content-Type": "application/json",
-        },
-        body : JSON.stringify(value)
-      });
-  
-      const data = await res.json()
-      console.log(data)
-  
-      if(data.success){
-        localStorage.removeItem("flights")
-        localStorage.removeItem("max")
-        localStorage.removeItem("min")
-        localStorage.removeItem("str")
-        localStorage.removeItem("from")
-        localStorage.removeItem("to")
-        localStorage.removeItem("candidate")
-        navigate(`/payment/${parems.id}`,{
-          state : {
-            bookingId : data.data.id,
-            passengers : value
-          }
-        })
-      }
-      else{
-        if(data.message === "Please login."){
-          navigate("/login")
+      const res = await fetch(
+        `http://localhost:4000/book/api/book/flight-booking`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(value),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.success) {
+        localStorage.removeItem("flights");
+        localStorage.removeItem("max");
+        localStorage.removeItem("min");
+        localStorage.removeItem("str");
+        localStorage.removeItem("from");
+        localStorage.removeItem("to");
+        localStorage.removeItem("candidate");
+        navigate(`/payment/${parems.id}`, {
+          state: {
+            bookingId: data.data.id,
+            passengers: value,
+          },
+        });
+      } else {
+        if (data.message === "Please login.") {
+          navigate("/login");
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
   };
   useEffect(() => {
     const getFlight = async () => {
@@ -83,14 +84,13 @@ const Flight = () => {
             },
           }
         );
-  
+
         const data = await res.json();
         // console.log(data.data.flight)
         setflight(data.data.flight[0]);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-      
     };
 
     getFlight();
@@ -177,7 +177,9 @@ const Flight = () => {
                   name="email"
                   placeholder="exapmle@gmail.com"
                   required
-                  onChange={(e)=> {setemail(e.target.value)}}
+                  onChange={(e) => {
+                    setemail(e.target.value);
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <label

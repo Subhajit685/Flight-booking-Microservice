@@ -2,9 +2,10 @@ import { StatusCodes } from "http-status-codes"
 import con from "../config/DB_connection.js"
 
 export const crateAirport = async (req, res) => {
+    const connection = await con.getConnection()
     try {
         let sqlQuery = `INSERT INTO airport (name, code, address, city_id) VALUES (?, ?, ?, ?);`
-        const [airport] = await con.execute(sqlQuery, [req.body.name, req.body.code, req.body.address, req.body.city_id])
+        const [airport] = await connection.execute(sqlQuery, [req.body.name, req.body.code, req.body.address, req.body.city_id])
         return res.status(StatusCodes.CREATED).json({
             success: true,
             message: "Airport create successfully",
@@ -20,6 +21,7 @@ export const crateAirport = async (req, res) => {
 }
 
 export const getAllAirport = async (req, res) => {
+    const connection = await con.getConnection()
     try {
         const sqlQuery = `
         SELECT 
@@ -33,7 +35,7 @@ export const getAllAirport = async (req, res) => {
         JOIN city ON airport.city_id = city.id;
     `;
 
-        const [airplanes] = await con.execute(sqlQuery)
+        const [airplanes] = await connection.execute(sqlQuery)
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "All airport",
@@ -49,6 +51,7 @@ export const getAllAirport = async (req, res) => {
 }
 
 export const getAirportById = async (req, res) => {
+    const connection = await con.getConnection()
     const id = req.params?.id
     try {
         const sqlQuery = `SELECT 
@@ -60,7 +63,7 @@ export const getAirportById = async (req, res) => {
             city.name AS city_name
         FROM airport
         JOIN city ON airport.city_id = city.id where airport.id = ?`
-        const [airplane] = await con.execute(sqlQuery, [id])
+        const [airplane] = await connection.execute(sqlQuery, [id])
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "Airport by id",
@@ -76,6 +79,7 @@ export const getAirportById = async (req, res) => {
 }
 
 export const updateAirport = async (req, res) => {
+    const connection = await con.getConnection()
     const id = req.params.id
     if (!req.body.name && !req.body.code && !req.body.address && !req.body.city_id) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -91,7 +95,7 @@ export const updateAirport = async (req, res) => {
         model_name = ?
         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.model_name, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.model_name, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -112,7 +116,7 @@ export const updateAirport = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.capacity, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.capacity, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -134,7 +138,7 @@ export const updateAirport = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.model_name, req.body.capacity, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.model_name, req.body.capacity, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -154,11 +158,12 @@ export const updateAirport = async (req, res) => {
 }
 
 export const deleteAirport = async (req, res) => {
+    const connection = await con.getConnection()
     const id = req.params.id
     const sqlQuery = "DELETE FROM airport WHERE id = ?;"
 
     try {
-        const [airplane] = await con.execute(sqlQuery, [id])
+        const [airplane] = await connection.execute(sqlQuery, [id])
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "Deleted successfully",

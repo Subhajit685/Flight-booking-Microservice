@@ -7,6 +7,7 @@ dotenv.config()
 
 export const flightBooking = async (req, res) =>{
     const {flight_id, email, candidates, num_candidates, total_price} = req.body
+    const connection = await con.getConnection()
 
     if(!flight_id, !email, !candidates, !num_candidates, !total_price){
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -27,7 +28,7 @@ export const flightBooking = async (req, res) =>{
                 data: {}
             })
         }
-        const [booking] = await con.execute(sqlQuery, [flight_id, email, JSON.stringify(candidates), num_candidates, total_price])
+        const [booking] = await connection.execute(sqlQuery, [flight_id, email, JSON.stringify(candidates), num_candidates, total_price])
         if(booking.affectedRows > 0){
 
             const responce = await axios.post(`${process.env.AIRPLANE_BASE_URL}/api/flight/dic/${num_candidates}/${flight_id}`)
@@ -57,12 +58,13 @@ export const cancelBooking = async(req, res) =>{
     const {bookingID} = req.params
     const sql = `select * from flight_bookings where id = ?;`;
     const delsql = `DELETE FROM flight_bookings WHERE id = ?;`;
+    const connection = await con.getConnection()
     try {
-        const [booking] = await con.execute(sql, [bookingID])
+        const [booking] = await connection.execute(sql, [bookingID])
         if(booking.length > 0){
             const responce = await axios.post(`${process.env.AIRPLANE_BASE_URL}/api/flight/inc/${booking[0].num_candidates}/${booking[0].flight_id}`)
 
-            const [result] = await con.execute(delsql, [bookingID])
+            const [result] = await connection.execute(delsql, [bookingID])
             if(result.affectedRows > 0){
                 await DELconnectMq(booking[0])
                 return res.status(StatusCodes.OK).json({
@@ -97,7 +99,7 @@ export const showBookOrder = async (req, res) => {
 
         const sql = `select * from flight_bookings where email = ?;`;
 
-        const [result] = await con.execute(sql, [email])
+        const [result] = await connection.execute(sql, [email])
 
         if(result.length > 0){
             return res.status(StatusCodes.OK).json({

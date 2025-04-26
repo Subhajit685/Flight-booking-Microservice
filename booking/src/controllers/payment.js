@@ -5,12 +5,12 @@ import { StatusCodes } from "http-status-codes";
 
 export const payment = async (req, res) => {
   const bookingId = req.params.bookingid;
-  console.log(bookingId)
+  const connection = await con.getConnection()
 
   const sqlQuery = "select * from flight_bookings where id = ?;";
 
   try {
-    const [bookedFlight] = await con.execute(sqlQuery, [bookingId]);
+    const [bookedFlight] = await connection.execute(sqlQuery, [bookingId]);
     const bookedTime = bookedFlight[0].booked_at;
 
     const time = isLessThanFiveMinutes(
@@ -20,7 +20,7 @@ export const payment = async (req, res) => {
 
     if (time) {
       const sql = `update flight_bookings set status = 'confirmed', payment_at = NOW() where id = ?;`;
-      const [result] = await con.execute(sql, [bookingId]);
+      const [result] = await connection.execute(sql, [bookingId]);
       if (result.affectedRows > 0) {
         await connectMq(bookedFlight[0]);
         return res.status(StatusCodes.OK).json({

@@ -18,14 +18,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const deleteFlight = async () => {
+  const connection = await con.getConnection();
   const sqlQuery = "SELECT * FROM flight WHERE departure_time < NOW();";
   try {
-    const [flight] = await con.execute(sqlQuery);
+    const [flight] = await connection.execute(sqlQuery);
 
     if (flight.length > 0) {
       flight.map(async (item) => {
         const sqlQuery = "DELETE FROM flight WHERE id = ?";
-        await con.execute(sqlQuery, [item.id]);
+        await connection.execute(sqlQuery, [item.id]);
       });
     }
   } catch (error) {
@@ -34,7 +35,7 @@ const deleteFlight = async () => {
 };
 
 cron.schedule("* * * * *", deleteFlight);
-cron.schedule("42 9 * * *", addflightPErDay);
+cron.schedule("01 12 * * *", addflightPErDay);
 
 app.use("/api/airplane", airplaneRoute);
 app.use("/api/city", cityRoute);

@@ -11,13 +11,16 @@ const AllBookingsPage = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/book/api/book/show/booking/${parems.email}`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(
+          `http://localhost:4000/book/api/book/show/booking/${parems.email}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         const data = await res.json();
         if (data.success) {
@@ -34,17 +37,22 @@ const AllBookingsPage = () => {
   }, [parems.email]);
 
   const handleCancelBooking = async (bookingID) => {
-    const confirm = window.confirm("Are you sure you want to cancel this booking?");
+    const confirm = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/book/api/book/cancle/${bookingID}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        `http://localhost:4000/book/api/book/cancle/${bookingID}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const result = await res.json();
       if (result.success) {
@@ -80,7 +88,8 @@ const AllBookingsPage = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-bold text-gray-800">
-                    Booking ID: <span className="text-indigo-600">{booking.id}</span>
+                    Booking ID:{" "}
+                    <span className="text-indigo-600">{booking.id}</span>
                   </h2>
                   <span className="px-2 py-1 text-xs bg-teal-100 text-teal-700 rounded-full">
                     {booking.flight_id}
@@ -95,7 +104,8 @@ const AllBookingsPage = () => {
                     <strong>Total Price:</strong> ₹{booking.totel_price}
                   </p>
                   <p>
-                    <strong>Booked on:</strong> {new Date(booking.created_at).toLocaleDateString()}
+                    <strong>Booked on:</strong>{" "}
+                    {new Date(booking.created_at).toLocaleDateString()}
                   </p>
                 </div>
 

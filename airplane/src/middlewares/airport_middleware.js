@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes"
 import con from "../config/DB_connection.js"
 
 export const  airportValidator = async (req, res, next) =>{
+    const connection = await con.getConnection()
     
     try {
             if (!req.body.name || !req.body.code || !req.body.address || !req.body.city_id) {
@@ -13,7 +14,7 @@ export const  airportValidator = async (req, res, next) =>{
             }
 
             const sqlQuery = "select * from airport where code = ?"
-            const [airport] = await con.execute(sqlQuery, [req.body.code])
+            const [airport] = await connection.execute(sqlQuery, [req.body.code])
 
             if(airport[0]){
                 return res.status(StatusCodes.BAD_REQUEST).json({

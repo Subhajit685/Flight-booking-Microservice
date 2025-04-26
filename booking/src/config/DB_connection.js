@@ -1,19 +1,24 @@
 import mysql from "mysql2"
 
-const con = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    database : "airplanebooking",
-    password : 'Babai@09'
-})
+const con = mysql.createPool({
+  host: "mysql",
+  port: 3306,
+  user: "root",
+  password: "root",
+  database: "airplane",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  });
 
-con.connect((err)=>{
-    if(err){
-        console.log(`Database not connected : ${err}`)
-    }else{
-        console.log(`Database connected`)
+con.getConnection((err, connection) => {
+    if (err) {
+      console.error("Error connecting to mysql pool =", err);
+      return;
     }
-})
+    console.log("Connected to database successfully");
+    if (connection) connection.release();
+  });
+ 
 
 export default con.promise()

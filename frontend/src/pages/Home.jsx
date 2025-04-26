@@ -18,95 +18,90 @@ const Home = () => {
   const [priceFiltermin, setPriceFiltermin] = useState(0);
   const [timeFilter, setTimeFilter] = useState("");
 
-  const [min, setmin] = useState(0)
-  const [max, setmax] = useState(0)
+  const [min, setmin] = useState(0);
+  const [max, setmax] = useState(0);
 
   let str = localStorage.getItem("str") ? localStorage.getItem("str") : "";
   let from = localStorage.getItem("from") ? localStorage.getItem("from") : "";
   let to = localStorage.getItem("to") ? localStorage.getItem("to") : "";
   const handleSearch = async () => {
-
-    str = ""
+    str = "";
 
     if (searchData.candidate > 0) {
-      str = str + `candidate=${searchData.candidate}&`
+      str = str + `candidate=${searchData.candidate}&`;
     }
     if (searchData.date) {
       const inputDate = searchData.date; // YYYY-MM-DD
       const [year, month, day] = inputDate.split("-");
       const formattedDate = `${day}-${month}-${year}`;
-      str = str + `date=${formattedDate}&`
+      str = str + `date=${formattedDate}&`;
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/airplane/api/flight/filter?${str}travel=${searchData.from}-${searchData.to}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-  
-      })
-  
-      const data = await res.json()
-  
-      console.log(data)
+      const res = await fetch(
+        `http://localhost:4000/airplane/api/flight/filter?${str}travel=${searchData.from}-${searchData.to}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      console.log(data);
       if (data.success) {
-        localStorage.setItem("flights", JSON.stringify(data.data.filter))
-        localStorage.setItem("max", data.max)
-        localStorage.setItem("min", data.min)
-        localStorage.setItem("str", str)
-        localStorage.setItem("from", searchData.from)
-        localStorage.setItem("to", searchData.to)
-        localStorage.setItem("candidate", searchData.candidate)
-        setFlights(data.data.filter)
-        setmin(data.min)
-        setmax(data.max)
-  
+        localStorage.setItem("flights", JSON.stringify(data.data.filter));
+        localStorage.setItem("max", data.max);
+        localStorage.setItem("min", data.min);
+        localStorage.setItem("str", str);
+        localStorage.setItem("from", searchData.from);
+        localStorage.setItem("to", searchData.to);
+        localStorage.setItem("candidate", searchData.candidate);
+        setFlights(data.data.filter);
+        setmin(data.min);
+        setmax(data.max);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-
-
   };
   const handleSearchFilter = async () => {
-
-
-    if(priceFiltermax !== 0){
-      str = str + `price=${priceFiltermin}-${priceFiltermax}&`
+    if (priceFiltermax !== 0) {
+      str = str + `price=${priceFiltermin}-${priceFiltermax}&`;
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/airplane/api/flight/filter?${str}travel=${searchData.from ? searchData.from : from}-${searchData.to ? searchData.to : to}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-  
-      })
-  
-      const data = await res.json()
+      const res = await fetch(
+        `http://localhost:4000/airplane/api/flight/filter?${str}travel=${
+          searchData.from ? searchData.from : from
+        }-${searchData.to ? searchData.to : to}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
       // console.log(data.data)
-      console.log(data)
+      console.log(data);
       if (data.success) {
-        localStorage.setItem("flights", JSON.stringify(data.data.filter))
-        setFlights(data.data.filter)
+        localStorage.setItem("flights", JSON.stringify(data.data.filter));
+        setFlights(data.data.filter);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-    
   };
 
   const handleChange = (e) => {
     setSearchData({ ...searchData, [e.target.name]: e.target.value });
-
   };
-
 
   const matchTimeSlot = (flightTime, filterTime) => {
     if (!filterTime) return true;
@@ -118,22 +113,15 @@ const Home = () => {
     return true;
   };
 
+  useEffect(() => {
+    const loclFlights = localStorage.getItem("flights");
 
-
-  useEffect(()=>{
-
-    const loclFlights = localStorage.getItem("flights")
-
-    if(loclFlights){
-      setFlights(JSON.parse(loclFlights))
-      setmax(localStorage.getItem("max"))
-      setmin(localStorage.getItem("min"))
+    if (loclFlights) {
+      setFlights(JSON.parse(loclFlights));
+      setmax(localStorage.getItem("max"));
+      setmin(localStorage.getItem("min"));
     }
-
-  },[])
-
-
-
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 via-white to-teal-100 flex flex-col text-sm sm:text-base">
@@ -154,8 +142,8 @@ const Home = () => {
                   field === "date"
                     ? "date"
                     : field === "candidate"
-                      ? "number"
-                      : "text"
+                    ? "number"
+                    : "text"
                 }
                 name={field}
                 value={searchData[field]}
@@ -173,7 +161,6 @@ const Home = () => {
             </button>
           </div>
         </div>
-
 
         {/* Advertisements */}
         {flights.length === 0 && (
@@ -220,17 +207,39 @@ const Home = () => {
                 </label> */}
                 <div className="flex gap-1">
                   <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Min price</label>
-                  <input className="border rounded w-full p-1" placeholder="0" type="number" onChange={(e)=> {setPriceFiltermin(e.target.value)}}/>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Min price
+                    </label>
+                    <input
+                      className="border rounded w-full p-1"
+                      placeholder="0"
+                      type="number"
+                      onChange={(e) => {
+                        setPriceFiltermin(e.target.value);
+                      }}
+                    />
                   </div>
                   <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max price</label>
-                  <input className="border rounded w-full p-1" placeholder="0" type="number" onChange={(e)=> {setPriceFiltermax(e.target.value)}}/>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Max price
+                    </label>
+                    <input
+                      className="border rounded w-full p-1"
+                      placeholder="0"
+                      type="number"
+                      onChange={(e) => {
+                        setPriceFiltermax(e.target.value);
+                      }}
+                    />
                   </div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span className="block text-sm font-medium text-gray-700 mb-1">₹{min}</span>
-                  <span className="block text-sm font-medium text-gray-700 mb-1">₹{max}</span>
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    ₹{min}
+                  </span>
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    ₹{max}
+                  </span>
                 </div>
               </div>
 
@@ -254,23 +263,19 @@ const Home = () => {
               </div>
 
               <div className="w-full">
-              <button
-              onClick={handleSearchFilter}
-              className="bg-blue-500 text-white px-2 sm:px-4 py-2 sm:py-3 rounded hover:bg-blue-600 font-bold cursor-pointer transition w-full mt-4"
-            >
-              Search Flights
-            </button>
+                <button
+                  onClick={handleSearchFilter}
+                  className="bg-blue-500 text-white px-2 sm:px-4 py-2 sm:py-3 rounded hover:bg-blue-600 font-bold cursor-pointer transition w-full mt-4"
+                >
+                  Search Flights
+                </button>
               </div>
             </aside>
 
             {/* Flights List */}
             <section className="lg:col-span-3 space-y-3 sm:space-y-4">
               {flights.map((flight, i) => (
-                <FlightCard
-                  key={i}
-                  flight={flight}
-                  searchData={searchData}
-                />
+                <FlightCard key={i} flight={flight} searchData={searchData} />
               ))}
             </section>
           </div>

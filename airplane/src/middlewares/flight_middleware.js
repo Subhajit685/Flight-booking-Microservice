@@ -3,6 +3,7 @@ import con from "../config/DB_connection.js"
 import { timeCalculate } from "../utils/timeCalculare.js"
 
 export const flightValidator = async (req, res, next) => {
+    const connection = await con.getConnection()
 
     try {
         if (!req.body.flight_name || !req.body.departure_airport_id || !req.body.arrival_airport_id || !req.body.departure_time || !req.body.arrival_time || !req.body.price || !req.body.airplane_id) {
@@ -14,7 +15,7 @@ export const flightValidator = async (req, res, next) => {
         }
 
         const sqlDepartureQuery = "select * from airport where id = ?"
-        const [departureAirport] = await con.execute(sqlDepartureQuery, [req.body.departure_airport_id])
+        const [departureAirport] = await connection.execute(sqlDepartureQuery, [req.body.departure_airport_id])
 
         if (!departureAirport[0]) {
             return res.status(StatusCodes.BAD_REQUEST).json({
@@ -25,7 +26,7 @@ export const flightValidator = async (req, res, next) => {
         }
 
         const sqlArrivalQuery = "select * from airport where id = ?"
-        const [arrivalAirport] = await con.execute(sqlArrivalQuery, [req.body.arrival_airport_id])
+        const [arrivalAirport] = await connection.execute(sqlArrivalQuery, [req.body.arrival_airport_id])
 
         if (!arrivalAirport[0]) {
             return res.status(StatusCodes.BAD_REQUEST).json({
@@ -36,7 +37,7 @@ export const flightValidator = async (req, res, next) => {
         }
 
         const sqlAirplaneQuery = "select * from airplane where id = ?"
-        const [airplane] = await con.execute(sqlAirplaneQuery, [req.body.airplane_id])
+        const [airplane] = await connection.execute(sqlAirplaneQuery, [req.body.airplane_id])
 
 
         if (!airplane[0]) {

@@ -8,8 +8,8 @@ const PaymentReviewPage = () => {
   const parems = useParams();
   const [flight, setFlight] = useState({});
   const { bookingId, passengers } = location.state || {};
-  const navigate = useNavigate()
-  const user = localStorage.getItem("user")
+  const navigate = useNavigate();
+  const user = localStorage.getItem("user");
 
   useEffect(() => {
     const getFlight = async () => {
@@ -37,24 +37,27 @@ const PaymentReviewPage = () => {
 
   const handlePayment = async (e) => {
     try {
-      const res = await fetch(`http://localhost:4000/book/api/Payment/${bookingId}`, {
-        method : "POST",
-        credentials : "include",
-        headers : {
-          "Content-Type" : "application/json"
-        },
-        body : JSON.stringify({})
-      })
+      const res = await fetch(
+        `http://localhost:4000/book/api/Payment/${bookingId}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        }
+      );
 
-      const data = await res.json()
-      console.log(data)
+      const data = await res.json();
+      console.log(data);
 
-      if(data.success){
-        alert(data.message)
-        navigate(`/user/${user}`)
+      if (data.success) {
+        alert(data.message);
+        navigate(`/user/${user}`);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
@@ -69,14 +72,28 @@ const PaymentReviewPage = () => {
           </h2>
           <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
             <div>
-              <p><strong>Flight ID:</strong> {flight?.flight_id}</p>
-              <p><strong>Model:</strong> {flight?.airplane_model}</p>
-              <p><strong>Price:</strong> ₹{passengers?.total_price}</p>
+              <p>
+                <strong>Flight ID:</strong> {flight?.flight_id}
+              </p>
+              <p>
+                <strong>Model:</strong> {flight?.airplane_model}
+              </p>
+              <p>
+                <strong>Price:</strong> ₹{passengers?.total_price}
+              </p>
             </div>
             <div>
-              <p><strong>Departure:</strong> {flight?.departure_airport_name} ({flight?.departure_time})</p>
-              <p><strong>Arrival:</strong> {flight?.arrival_airport_name} ({flight?.arrival_time})</p>
-              <p><strong>Available Seats:</strong> {flight?.available_seat}</p>
+              <p>
+                <strong>Departure:</strong> {flight?.departure_airport_name} (
+                {flight?.departure_time})
+              </p>
+              <p>
+                <strong>Arrival:</strong> {flight?.arrival_airport_name} (
+                {flight?.arrival_time})
+              </p>
+              <p>
+                <strong>Available Seats:</strong> {flight?.available_seat}
+              </p>
             </div>
           </div>
         </div>
@@ -92,8 +109,12 @@ const PaymentReviewPage = () => {
               className="border border-gray-200 rounded-lg p-4 mb-3 bg-gray-50"
             >
               <p className="font-medium">Passenger {index + 1}</p>
-              <p><strong>Name:</strong> {p.name}</p>
-              <p><strong>Age:</strong> {p.age}</p>
+              <p>
+                <strong>Name:</strong> {p.name}
+              </p>
+              <p>
+                <strong>Age:</strong> {p.age}
+              </p>
               {/* <p><strong>Gender:</strong> {p.gender}</p> */}
             </div>
           ))}

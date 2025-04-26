@@ -2,8 +2,9 @@ import con from "../config/DB_connection.js"
 
 
 const airplaneSet = async(id) =>{
+    const connection = await con.getConnection()
     const sqlQuery = `Select * from airplane where id = ${id};`
-    const [ airplane] = await con.execute(sqlQuery)
+    const [ airplane] = await connection.execute(sqlQuery)
     return airplane[0].capacity
 }
 
@@ -11,7 +12,7 @@ const airplaneSet = async(id) =>{
 export const addflightPErDay = async() => {
     // let today = new Date().toISOString().slice(0, 10)
     let today = new Date();
-    today.setDate(today.getDate() + 1);
+    today.setDate(today.getDate() );
     today = today.toISOString().slice(0, 10);
 
     const arr = [[`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('UK5180', 12, 13, '${today} 06:39:00', '${today} 08:20:00', 7650, 'C2', 80, ?);`, "80"],
@@ -4365,10 +4366,11 @@ export const addflightPErDay = async() => {
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('G86119', 40, 41, '${today} 18:58:00', '${today} 22:09:00', 10304, 'A2', 66, ?);`, "66"],
     [`INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES ('6E3479', 41, 40, '${today} 18:50:00', '${today} 20:02:00', 13563, 'D2', 52, ?);`, "52"]]
 
+    const connection = await con.getConnection()
     try {
         arr.map(async(item)=>{
             const seat = await airplaneSet(Number(item[1]))
-            await con.execute(item[0], [seat])
+            await connection.execute(item[0], [seat])
         })
     } catch (error) {
         console.log(error)

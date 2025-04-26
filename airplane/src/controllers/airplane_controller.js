@@ -2,9 +2,10 @@ import { StatusCodes } from "http-status-codes"
 import con from "../config/DB_connection.js"
 
 export const crateAirplane = async (req, res) => {
+    const connection = await con.getConnection()
     try {
         let sqlQuery = `INSERT INTO airplane (model_name, capacity) VALUES (? ,?);`
-        const [airplane] = await con.execute(sqlQuery, [req.body.model_name, req.body.capacity])
+        const [airplane] = await connection.execute(sqlQuery, [req.body.model_name, req.body.capacity])
         return res.status(StatusCodes.CREATED).json({
             success: true,
             message: "Airplane create successfully",
@@ -20,9 +21,10 @@ export const crateAirplane = async (req, res) => {
 }
 
 export const getAllAirplane = async (req, res) => {
+    const connection = await con.getConnection()
     try {
         const sqlQuery = "select * from airplane"
-        const [airplanes] = await con.execute(sqlQuery)
+        const [airplanes] = await connection.execute(sqlQuery)
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "All airplanes",
@@ -38,10 +40,11 @@ export const getAllAirplane = async (req, res) => {
 }
 
 export const getAirplaneById = async (req, res) => {
+    const connection = await con.getConnection()
     const id = req.params?.id
     try {
         const sqlQuery = "select * from airplane where id = ?"
-        const [airplane] = await con.execute(sqlQuery, [id])
+        const [airplane] = await connection.execute(sqlQuery, [id])
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "Airplane by id",
@@ -57,6 +60,7 @@ export const getAirplaneById = async (req, res) => {
 }
 
 export const updateAirplane = async (req, res) => {
+    const connection = await con.getConnection()
     const id = req.params.id
     if (!req.body.model_name && !req.body.capacity) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -72,7 +76,7 @@ export const updateAirplane = async (req, res) => {
         model_name = ?
         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.model_name, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.model_name, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -93,7 +97,7 @@ export const updateAirplane = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.capacity, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.capacity, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -115,7 +119,7 @@ export const updateAirplane = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`
         try {
-            const [updateAirplane] = await con.execute(sqlQuery, [req.body.model_name, req.body.capacity, id])
+            const [updateAirplane] = await connection.execute(sqlQuery, [req.body.model_name, req.body.capacity, id])
 
             return res.status(StatusCodes.OK).json({
                 success: true,
@@ -135,11 +139,12 @@ export const updateAirplane = async (req, res) => {
 }
 
 export const deleteAirplane = async (req, res) =>{
+    const connection = await con.getConnection()
     const id = req.params.id
     const sqlQuery = "DELETE FROM airplane WHERE id = ?;"
 
     try {
-        const [airplane] = await con.execute(sqlQuery, [id])
+        const [airplane] = await connection.execute(sqlQuery, [id])
         return res.status(StatusCodes.OK).json({
             success: true,
             message: "Deleted successfully",

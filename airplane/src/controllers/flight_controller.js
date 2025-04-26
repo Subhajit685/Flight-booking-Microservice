@@ -2,15 +2,16 @@ import { StatusCodes } from "http-status-codes";
 import con from "../config/DB_connection.js";
 
 export const crateFlight = async (req, res) => {
+  const connection = await con.getConnection()
   const sqlAirplaneQuery = "select * from airplane where id = ?";
-  const [airplane] = await con.execute(sqlAirplaneQuery, [
+  const [airplane] = await connection.execute(sqlAirplaneQuery, [
     req.body.airplane_id,
   ]);
 
   console.log();
   try {
     let sqlQuery = `INSERT INTO flight (flight_name, departure_airport_id, arrival_airport_id, departure_time, arrival_time, price, boarding_gate, airplane_id, available_seat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-    const [flight] = await con.execute(sqlQuery, [
+    const [flight] = await connection.execute(sqlQuery, [
       req.body.flight_name,
       req.body.departure_airport_id,
       req.body.arrival_airport_id,
@@ -37,6 +38,7 @@ export const crateFlight = async (req, res) => {
 };
 
 export const getAllFlight = async (req, res) => {
+  const connection = await con.getConnection()
   try {
     const sqlQuery = `SELECT 
     f.id AS flight_id,
@@ -51,7 +53,7 @@ export const getAllFlight = async (req, res) => {
     JOIN city arr_city ON arr_airport.city_id = arr_city.id
     JOIN airplane a ON f.airplane_id = a.id;`;
 
-    const [flights] = await con.execute(sqlQuery);
+    const [flights] = await connection.execute(sqlQuery);
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "All flights",
@@ -68,6 +70,7 @@ export const getAllFlight = async (req, res) => {
 };
 
 export const getFlightById = async (req, res) => {
+  const connection = await con.getConnection()
   const id = req.params?.id;
   try {
     const sqlQuery = `SELECT 
@@ -82,7 +85,7 @@ export const getFlightById = async (req, res) => {
     JOIN airport arr_airport ON f.arrival_airport_id = arr_airport.id
     JOIN city arr_city ON arr_airport.city_id = arr_city.id
     JOIN airplane a ON f.airplane_id = a.id where f.id = ?`;
-    const [flight] = await con.execute(sqlQuery, [id]);
+    const [flight] = await connection.execute(sqlQuery, [id]);
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Flight by id",
@@ -98,6 +101,7 @@ export const getFlightById = async (req, res) => {
 };
 
 export const updateFlight = async (req, res) => {
+  const connection = await con.getConnection()
   const id = req.params.id;
   if (
     !req.body.name &&
@@ -118,7 +122,7 @@ export const updateFlight = async (req, res) => {
         model_name = ?
         WHERE id = ?;`;
     try {
-      const [updateAirplane] = await con.execute(sqlQuery, [
+      const [updateAirplane] = await connection.execute(sqlQuery, [
         req.body.model_name,
         id,
       ]);
@@ -142,7 +146,7 @@ export const updateFlight = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`;
     try {
-      const [updateAirplane] = await con.execute(sqlQuery, [
+      const [updateAirplane] = await connection.execute(sqlQuery, [
         req.body.capacity,
         id,
       ]);
@@ -167,7 +171,7 @@ export const updateFlight = async (req, res) => {
                         capacity = ?
                         WHERE id = ?;`;
     try {
-      const [updateAirplane] = await con.execute(sqlQuery, [
+      const [updateAirplane] = await connection.execute(sqlQuery, [
         req.body.model_name,
         req.body.capacity,
         id,
@@ -189,11 +193,12 @@ export const updateFlight = async (req, res) => {
 };
 
 export const deleteFlight = async (req, res) => {
+  const connection = await con.getConnection()
   const id = req.params.id;
   const sqlQuery = "DELETE FROM flight WHERE id = ?;";
 
   try {
-    const [flight] = await con.execute(sqlQuery, [id]);
+    const [flight] = await connection.execute(sqlQuery, [id]);
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Deleted successfully",
@@ -209,6 +214,7 @@ export const deleteFlight = async (req, res) => {
 };
 
 export const filerFlight = async (req, res) => {
+  const connection = await con.getConnection()
   console.log(req.query);
   let sqlQuery = `SELECT 
   f.id AS flight_id,
@@ -286,7 +292,7 @@ export const filerFlight = async (req, res) => {
     // console.log(sqlQuery)
     let min = 0;
     let max = 0;
-    const [filter] = await con.execute(sqlQuery);
+    const [filter] = await connection.execute(sqlQuery);
     // console.log(filter)
 
     if (filter.length > 0) {
@@ -321,11 +327,12 @@ export const filerFlight = async (req, res) => {
 };
 
 export const seatDic = async (req, res) => {
+  const connection = await con.getConnection()
   const { seat, flightID } = req.params;
 
   const sql = `update flight set available_seat = available_seat - ? where id = ?;`;
   try {
-    const [result] = await con.execute(sql, [seat, flightID]);
+    const [result] = await connection.execute(sql, [seat, flightID]);
     if (result.affectedRows > 0) {
       return res.status(StatusCodes.OK).json({
         success: true,
@@ -355,11 +362,12 @@ export const seatDic = async (req, res) => {
 };
 
 export const seatInc = async (req, res) => {
+  const connection = await con.getConnection()
   const { seat, flightID } = req.params;
 
   const sql = `update flight set available_seat = available_seat + ? where id = ?;`;
   try {
-    const [result] = await con.execute(sql, [seat, flightID]);
+    const [result] = await connection.execute(sql, [seat, flightID]);
     console.log(result);
     if (result.affectedRows > 0) {
       return res.status(StatusCodes.OK).json({

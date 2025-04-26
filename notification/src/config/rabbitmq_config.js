@@ -2,7 +2,7 @@ import amqplib from "amqplib"
 import { DelemailSender, emailSender } from "../utils/email_sender.js"
 
 export const connectMq = async () =>{
-    const connection = await amqplib.connect("amqp://localhost")
+    const connection = await amqplib.connect("amqp://rabbtimq")
     const channel = await connection.createChannel()
 
     await channel.assertQueue("noti", {

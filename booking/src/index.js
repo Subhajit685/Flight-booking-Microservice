@@ -7,6 +7,7 @@ import con from "./config/DB_connection.js";
 import isLessThanFiveMinutes from "./utils/timecompere.js";
 import axios from "axios";
 import cookieParser from "cookie-parser"
+import { connectMq } from "./config/rabbit_mp.js";
 dotenv.config();
 
 const app = express();
@@ -20,9 +21,10 @@ app.use(cookieParser())
 cron.schedule("* * * * * *", async () => {
   const sql = `SELECT * FROM flight_bookings WHERE status = 'pending';`;
   const delsql = `DELETE FROM flight_bookings WHERE id = ?;`;
+  const connection = await con.getConnection()
 
   try {
-    const [bookings] = await con.execute(sql);
+    const [bookings] = await connection.execute(sql);
 
     if (bookings.length > 0) {
       await Promise.all(
@@ -37,7 +39,7 @@ cron.schedule("* * * * * *", async () => {
               );
               const data = await response.data;
               if (data.success === true) {
-                const [delResult] = await con.execute(delsql, [book.id]);
+                const [delResult] = await connection.execute(delsql, [book.id]);
                 console.log("Delete result:", delResult);
               }
             } catch (err) {
@@ -57,5 +59,5 @@ app.use("/api/Payment", Payment);
 
 app.listen(PORT, async () => {
   console.log(`Booking Server running at port ${PORT}`);
-  // await connectMq();
+  await connectMq();
 });

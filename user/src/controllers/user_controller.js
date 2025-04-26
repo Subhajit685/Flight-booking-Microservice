@@ -2,6 +2,7 @@ import con from "../config/DB_connection.js";
 import { StatusCodes } from "http-status-codes";
 
 export const sign = async (req, res) => {
+  const connection = await con.getConnection()
   const { email } = req.body;
 
   if (!email) {
@@ -15,7 +16,7 @@ export const sign = async (req, res) => {
   const checksql = `select * from users where email = ?;`;
 
   try {
-    const [user] = await con.execute(checksql, [email]);
+    const [user] = await connection.execute(checksql, [email]);
     if (user.length > 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -33,7 +34,7 @@ export const sign = async (req, res) => {
 
   const sql = `insert into users (email) value (?);`;
   try {
-    const [user] = await con.execute(sql, [email]);
+    const [user] = await connection.execute(sql, [email]);
 
     if (user.affectedRows > 0) {
       res.cookie("email", email)
@@ -58,6 +59,7 @@ export const sign = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  const connection = await con.getConnection()
   const { email } = req.body;
   if (!email) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -69,7 +71,7 @@ export const login = async (req, res) => {
 
   const sql = `select * from users where email = ?;`;
   try {
-    const [user] = await con.execute(sql, [email]);
+    const [user] = await connection.execute(sql, [email]);
     if (user.length > 0) {
       res.cookie("email", email)
       return res.status(StatusCodes.OK).json({
@@ -93,6 +95,7 @@ export const login = async (req, res) => {
 };
 
 export const check = async (req, res) => {
+  const connection = await con.getConnection()
   try {
     const email = req.cookies.email
 
@@ -118,6 +121,7 @@ export const check = async (req, res) => {
 }
 
 export const logout = async (req, res) => {
+  const connection = await con.getConnection()
   try {
     const email = req.cookies.email
 

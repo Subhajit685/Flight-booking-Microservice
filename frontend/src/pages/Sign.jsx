@@ -2,34 +2,31 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Sign = () => {
-
-  const navigate = useNavigate()
-  const [email, setemail] = useState("")
+  const navigate = useNavigate();
+  const [email, setemail] = useState("");
 
   const handleLogin = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-
-      const res = await fetch(`http://localhost:4000/user/api/user/sign-up`,{
-        method : "POST",
-        credentials : "include",
-        headers : {
+      const res = await fetch(`http://localhost:4000/user/api/user/sign-up`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
           "Content-Type": "application/json",
         },
-        body : JSON.stringify({email})
-      })
+        body: JSON.stringify({ email }),
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
-      if(data.success){
-        localStorage.setItem("user", email)
-        navigate('/')
+      if (data.success) {
+        localStorage.setItem("user", email);
+        navigate("/");
       }
-      
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -48,7 +45,9 @@ const Sign = () => {
             name="email"
             placeholder="exapmle@gmail.com"
             required
-            onChange={(e)=> {setemail(e.target.value)}}
+            onChange={(e) => {
+              setemail(e.target.value);
+            }}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

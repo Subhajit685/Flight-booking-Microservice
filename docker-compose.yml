@@ -2,6 +2,15 @@ version: '3'
 
 services:
 
+  mysql:
+   image: mysql:latest
+   ports:
+    - "3307:3306"
+   environment:
+    MYSQL_ROOT_PASSWORD: root
+   volumes:
+      - airplane_bookung_mysql-data:/var/lib/mysql
+
   airplane:
     build: 
       dockerfile: Dockerfile
@@ -14,7 +23,8 @@ services:
       - ./airplane/.env
     depends_on:
       - rabbtimq
-    
+      - mysql
+
   apigatewaya:
     build: 
       dockerfile: Dockerfile
@@ -31,6 +41,7 @@ services:
       - booking
       - notification
       - user
+      - mysql
 
   booking:
     build: 
@@ -44,6 +55,7 @@ services:
       - ./booking/.env
     depends_on:
       - rabbtimq
+      - mysql
 
   notification:
     build: 
@@ -56,7 +68,8 @@ services:
     env_file:
       - ./notification/.env
     depends_on:
-      - rabbtimq
+      rabbtimq:
+        condition: service_healthy
 
   user:
     build: 
@@ -70,6 +83,7 @@ services:
       - ./user/.env
     depends_on:
       - rabbtimq
+      - mysql
 
   client:
     build: 
@@ -84,6 +98,17 @@ services:
 
   rabbtimq:
     image: rabbitmq:4-management
+    container_name: rabbtimq
     ports:
-      - "15672:15672"
       - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - mysql
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  airplane_bookung_mysql-data: 

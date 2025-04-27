@@ -22,19 +22,19 @@ The system is divided into five services:
 - **MySQL** (Database for all services)
 - **RabbitMQ** (Message broker for inter-service communication)
 - **Docker** + **Docker Compose** (Containerization and orchestration)
-- **JWT Authentication** (Secure user sessions)
 - **Nodemailer** (Email notifications)
 
 ---
 
 ## 📦 How to Run Locally
 
-### 1. Prerequisites
-- Docker installed
-- Docker Compose installed
-
-### 2. Clone the repository
-
-```bash
+### 1. Clone the repository 
 git clone https://github.com/your-username/flight-booking-system.git
 cd flight-booking-system
+
+### 2. Prerequisites
+Docker installed
+
+### 3. Run this docker compose commend
+docker compose up --build
+

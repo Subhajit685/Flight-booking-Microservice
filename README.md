@@ -29,12 +29,11 @@ The system is divided into five services:
 ## 📦 How to Run Locally
 
 ### 1. Clone the repository 
-git clone https://github.com/your-username/flight-booking-system.git
-cd flight-booking-system
+- git clone https://github.com/Subhajit685/Flight-booking-Microservice.git
 
 ### 2. Prerequisites
-Docker installed
+- Docker installed
 
 ### 3. Run this docker compose commend
-docker compose up --build
+- docker compose up --build
 
